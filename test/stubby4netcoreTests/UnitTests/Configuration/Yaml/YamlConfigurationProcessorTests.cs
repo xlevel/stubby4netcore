@@ -17,6 +17,10 @@ namespace stubby4netcoreTests.UnitTests.Configuration.Yaml
                 file: homePageRequest.xml
               response:
                 status: 200
+                headers:
+                    Content-Type: application/json
+                    Access-Control-Allow-Origin: ""*""
+                    server: stubbedServer/4.2
             ";
 
         [Fact]
@@ -125,6 +129,22 @@ namespace stubby4netcoreTests.UnitTests.Configuration.Yaml
             var result = processor.GetConfiguration().First();
 
             Assert.Equal(200, result.Response.Status);
+        }
+
+        [Theory]
+        [InlineData("Content-Type", "application/json")]
+        [InlineData("Access-Control-Allow-Origin", "*")]
+        [InlineData("server", "stubbedServer/4.2")]
+        public void GetConfiguration_WhenSuppliedAValidYamlConfiguration_TheResponseHeadersAreCorrect(string name, string value)
+        {
+            var config = BasicConfig;
+
+            var processor = new YamlConfigurationProcessor(config);
+
+            var result = processor.GetConfiguration().First();
+
+            Assert.True(result.Response.Headers.ContainsKey(name));
+            Assert.Equal(value, result.Response.Headers[name]);
         }
     }
 }

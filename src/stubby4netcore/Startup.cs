@@ -46,6 +46,9 @@ namespace stubby4netcore
         routeBuilder.MapGet(endpoint.Request.Url, context =>
         {
           context.Response.StatusCode = endpoint.Response.Status;
+          context.Response.Headers.Add("Content-Type", "application/json");
+          //context.Response.ContentType = "text/plain";
+
           return context.Response.WriteAsync(string.Empty);
         });
       }
