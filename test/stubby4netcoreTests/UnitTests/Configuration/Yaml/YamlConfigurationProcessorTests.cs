@@ -13,7 +13,7 @@ namespace stubby4netcoreTests.UnitTests.Configuration.Yaml
             - request:
                 url: /
                 method: GET
-                post: name=John&email=john@example.com
+                post: name=Bob&email=bob@example.com
                 file: homePageRequest.xml
               response:
                 status: 200
@@ -22,6 +22,20 @@ namespace stubby4netcoreTests.UnitTests.Configuration.Yaml
                     Access-Control-Allow-Origin: ""*""
                     server: stubbedServer/4.2
             ";
+
+        private const string JsonConfig = @"
+            - request:
+                url: /
+                method: GET
+                post: name=Bob&email=bob@example.com
+                file: homePageRequest.xml
+              response:
+                status: 200
+                headers:
+                    Content-Type: application/json
+                body: >
+                    {""name"":""Bob""}
+            "; 
 
         [Fact]
         public void GetConfiguration_WhenSuppliedAValidYamlConfiguration_ReturnsACollectionOfEndPoints()
@@ -92,7 +106,7 @@ namespace stubby4netcoreTests.UnitTests.Configuration.Yaml
 
             var result = processor.GetConfiguration().First();
 
-            Assert.Equal("name=John&email=john@example.com", result.Request.Post);
+            Assert.Equal("name=Bob&email=bob@example.com", result.Request.Post);
         }
 
         [Fact]
@@ -145,6 +159,16 @@ namespace stubby4netcoreTests.UnitTests.Configuration.Yaml
 
             Assert.True(result.Response.Headers.ContainsKey(name));
             Assert.Equal(value, result.Response.Headers[name]);
+        }
+
+        public void GetConfiguration_WhenSuppliedAConfigurationWthAJsonBody_TheResponseBodyIsCorrect() {
+            var config = JsonConfig;
+
+            var processor = new YamlConfigurationProcessor(config);
+
+            var result = processor.GetConfiguration().First();
+
+            Assert.Equal(@"{""name"":""Bob""}", result.Response.Body);
         }
     }
 }

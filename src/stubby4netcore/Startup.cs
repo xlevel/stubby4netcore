@@ -34,28 +34,13 @@ namespace stubby4netcore
     }
 
     // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-    public void Configure(IApplicationBuilder app, IHostingEnvironment env)
-    {
-      var configProcessorFactory = app.ApplicationServices.GetRequiredService<IConfigurationProcessorFactory>();
-      var endpointConfig = configProcessorFactory.getProcessor("").GetConfiguration(); //TODO: Load config file path
-
-      var routeBuilder = new RouteBuilder(app);
-
-      foreach (var endpoint in endpointConfig)
-      {
-        routeBuilder.MapGet(endpoint.Request.Url, context =>
+    public void Configure(IApplicationBuilder app, IHostingEnvironment env, IConfigurationProcessorFactory configProcessorFactory)
         {
-          context.Response.StatusCode = endpoint.Response.Status;
-          context.Response.Headers.Add("Content-Type", "application/json");
-          //context.Response.ContentType = "text/plain";
+            var endpointConfig = configProcessorFactory.getProcessor("").GetConfiguration(); //TODO: Load config file path
 
-          return context.Response.WriteAsync(string.Empty);
-        });
-      }
+            IRouter routes = RoutingProcessor.Build(app, endpointConfig);
 
-      var routes = routeBuilder.Build();
-
-      app.UseRouter(routes);
+            app.UseRouter(routes);
+        }
     }
-  }
 }

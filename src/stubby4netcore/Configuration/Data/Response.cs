@@ -7,5 +7,7 @@ namespace stubby4netcore.Configuration.Data
         public int Status { get; set; }
 
         public IDictionary<string, string> Headers { get; set; }
+
+        public string Body { get; set; }
     }
 }
